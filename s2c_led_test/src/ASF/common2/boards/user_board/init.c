@@ -11,6 +11,7 @@
 #include <asf.h>
 #include <board.h>
 #include <conf_board.h>
+//#include <port.h>
 
 #if defined(__GNUC__)
 void board_init(void) WEAK __attribute__((alias("system_board_init")));

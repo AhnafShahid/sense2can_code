@@ -27,6 +27,7 @@
 /*
  * Support and FAQ: visit <a href="https://www.microchip.com/support/">Microchip Support</a>
  */
+//#include <avr/io.h>
 #include <asf.h>
 
 int main (void)
