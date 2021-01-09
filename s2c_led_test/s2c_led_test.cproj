@@ -33,6 +33,7 @@
         <options>
           <option id="common.boards" value="Add" config="" content-id="Atmel.ASF" />
           <option id="sam0.drivers.system" value="Add" config="" content-id="Atmel.ASF" />
+          <option id="sam0.drivers.port" value="Add" config="" content-id="Atmel.ASF" />
           <option id="sam0.utils.linker_scripts" value="Add" config="" content-id="Atmel.ASF" />
         </options>
         <configurations />
@@ -187,6 +188,9 @@
           <file path="src/ASF/thirdparty/CMSIS/Lib/license.txt" framework="" version="" source="thirdparty/CMSIS/Lib/license.txt" changed="False" content-id="Atmel.ASF" />
           <file path="src/ASF/thirdparty/CMSIS/README.txt" framework="" version="" source="thirdparty/CMSIS/README.txt" changed="False" content-id="Atmel.ASF" />
           <file path="src/ASF/thirdparty/CMSIS/license.txt" framework="" version="" source="thirdparty/CMSIS/license.txt" changed="False" content-id="Atmel.ASF" />
+          <file path="src/ASF/sam0/drivers/port/port.c" framework="" version="3.34.1" source="sam0\drivers\port\port.c" changed="False" content-id="Atmel.ASF" />
+          <file path="src/ASF/sam0/drivers/port/quick_start/qs_port_basic.h" framework="" version="3.34.1" source="sam0\drivers\port\quick_start\qs_port_basic.h" changed="False" content-id="Atmel.ASF" />
+          <file path="src/ASF/sam0/drivers/port/port.h" framework="" version="3.34.1" source="sam0\drivers\port\port.h" changed="False" content-id="Atmel.ASF" />
         </files>
         <documentation help="http://asf.atmel.com/docs/3.45.0/common.applications.user_application.sam0_system.user_board.atsamc21e18a/html/index.html" />
         <offline-documentation help="" />
@@ -237,6 +241,7 @@
       <Value>../src/ASF/common2/boards/user_board</Value>
       <Value>../src</Value>
       <Value>../src/config</Value>
+      <Value>../src/ASF/sam0/drivers/port</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.level>Optimize for size (-Os)</armgcc.compiler.optimization.level>
@@ -282,6 +287,7 @@
       <Value>../src/ASF/common2/boards/user_board</Value>
       <Value>../src</Value>
       <Value>../src/config</Value>
+      <Value>../src/ASF/sam0/drivers/port</Value>
     </ListValues>
   </armgcc.assembler.general.IncludePaths>
   <armgcc.preprocessingassembler.general.AssemblerFlags>-DARM_MATH_CM0PLUS=true -DBOARD=USER_BOARD</armgcc.preprocessingassembler.general.AssemblerFlags>
@@ -309,6 +315,7 @@
       <Value>../src/ASF/common2/boards/user_board</Value>
       <Value>../src</Value>
       <Value>../src/config</Value>
+      <Value>../src/ASF/sam0/drivers/port</Value>
     </ListValues>
   </armgcc.preprocessingassembler.general.IncludePaths>
 </ArmGcc>
@@ -353,6 +360,7 @@
       <Value>../src/ASF/common2/boards/user_board</Value>
       <Value>../src</Value>
       <Value>../src/config</Value>
+      <Value>../src/ASF/sam0/drivers/port</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.level>Optimize (-O1)</armgcc.compiler.optimization.level>
@@ -399,6 +407,7 @@
       <Value>../src/ASF/common2/boards/user_board</Value>
       <Value>../src</Value>
       <Value>../src/config</Value>
+      <Value>../src/ASF/sam0/drivers/port</Value>
     </ListValues>
   </armgcc.assembler.general.IncludePaths>
   <armgcc.assembler.debugging.DebugLevel>Default (-g)</armgcc.assembler.debugging.DebugLevel>
@@ -427,6 +436,7 @@
       <Value>../src/ASF/common2/boards/user_board</Value>
       <Value>../src</Value>
       <Value>../src/config</Value>
+      <Value>../src/ASF/sam0/drivers/port</Value>
     </ListValues>
   </armgcc.preprocessingassembler.general.IncludePaths>
   <armgcc.preprocessingassembler.debugging.DebugLevel>Default (-Wa,-g)</armgcc.preprocessingassembler.debugging.DebugLevel>
@@ -445,6 +455,8 @@
     <Folder Include="src\ASF\common\utils\interrupt\" />
     <Folder Include="src\ASF\sam0\" />
     <Folder Include="src\ASF\sam0\drivers\" />
+    <Folder Include="src\ASF\sam0\drivers\port\" />
+    <Folder Include="src\ASF\sam0\drivers\port\quick_start\" />
     <Folder Include="src\ASF\sam0\drivers\system\" />
     <Folder Include="src\ASF\sam0\drivers\system\clock\" />
     <Folder Include="src\ASF\sam0\drivers\system\clock\clock_samc20_c21\" />
@@ -902,6 +914,15 @@
       <SubType>compile</SubType>
     </None>
     <None Include="src\ASF\common\utils\interrupt\interrupt_sam_nvic.h">
+      <SubType>compile</SubType>
+    </None>
+    <Compile Include="src\ASF\sam0\drivers\port\port.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="src\ASF\sam0\drivers\port\quick_start\qs_port_basic.h">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="src\ASF\sam0\drivers\port\port.h">
       <SubType>compile</SubType>
     </None>
     <Compile Include="src\ASF\sam0\drivers\system\clock\clock_samc20_c21\clock.c">
