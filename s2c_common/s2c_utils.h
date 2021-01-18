@@ -47,6 +47,8 @@ enum s2c_board_type {
 	 * --> bytes 2 & 3: radiator outlet temperature
 	 */
 	S2C_BOARD_RADIATOR,
+	S2C_BOARD_LINEAR_POT,
+	S2C_BOARD_STEERING_WHEEL,
 	/* Any other S2C board use */
 	S2C_BOARD_OTHER
 };
@@ -61,6 +63,8 @@ struct s2c_board_config {
 #define S2C_BOARD_WHEEL_CONFIG(x)			{ x.use_adc = true; x.adc_channels = 1; x.use_i2c = true; }
 #define S2C_BOARD_TIRE_TEMP_CONFIG(x)		{ x.use_adc = false; x.adc_channels = 0; x.use_i2c = true; }
 #define S2C_BOARD_RADIATOR_CONFIG(x)		{ x.use_adc = true; x.adc_channels = 2; x.use_i2c = false; }
+#define S2C_BOARD_LINEAR_POT_CONFIG(x)		{ x.use_adc = true; x.adc_channels = 1; x.use_i2c = false; }
+#define S2C_BOARD_STEERING_WHEEL_CONFIG(x)	{ x.use_adc = true; x.adc_channels = 1; x.use_i2c = false; }
 
 /*
  * Returns board type based on the board ID.
@@ -82,6 +86,16 @@ struct s2c_board_config {
  *      
  */
 static inline enum s2c_board_type get_board_type_from_id(uint8_t id) {
+	
+	if(id< 4){
+		return S2C_BOARD_LINEAR_POT;
+	}else if(id<5){
+		return S2C_BOARD_STEERING_WHEEL;
+	} else{
+		return S2C_BOARD_OTHER;
+	}
+	
+	/* OLD SETUP RF-18
 	if(id < 4) { // covers 0, 1, 2, 3
 		return S2C_BOARD_WHEEL;
 	} else if(id < 8) { // 4, 5, 6, 7
@@ -90,7 +104,7 @@ static inline enum s2c_board_type get_board_type_from_id(uint8_t id) {
 		return S2C_BOARD_RADIATOR;
 	} else {
 		return S2C_BOARD_OTHER;
-	}
+	}*/
 }
 
 // CAN stuff

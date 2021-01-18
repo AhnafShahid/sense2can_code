@@ -354,6 +354,18 @@ void loop_can(void) {
 		can_set_tx_buffer_element(&can_instance, &tx_elem, 0);
 		can_tx_transfer_request(&can_instance, 1);*/
 		break;
+		
+	case S2C_BOARD_LINEAR_POT:
+		tx_elem.T1.bit.DLC = 2;
+		tx_elem.T0.reg = CAN_TX_ELEMENT_T0_STANDARD_ID(CAN_MSG_ID(board_id, 0));
+		convert_16_bit_to_byte_array(adc_channel_vals[0], tx_elem.data);
+		break;
+		
+	case S2C_BOARD_STEERING_WHEEL:
+		tx_elem.T1.bit.DLC = 2;
+		tx_elem.T0.reg = CAN_TX_ELEMENT_T0_STANDARD_ID(CAN_MSG_ID(board_id, 0));
+		convert_16_bit_to_byte_array(adc_channel_vals[0], tx_elem.data);
+		break;
 	}
 	
 	// only send if tx_element has been configured i.e. if ID has been set
@@ -385,7 +397,21 @@ int main (void)
 	case S2C_BOARD_RADIATOR:
 		S2C_BOARD_RADIATOR_CONFIG(board_config);
 		break;
+		
+	case S2C_BOARD_LINEAR_POT:
+		S2C_BOARD_LINEAR_POT_CONFIG(board_config);
+		break;
 	
+	case S2C_BOARD_STEERING_WHEEL:
+		S2C_BOARD_STEERING_WHEEL_CONFIG(board_config);
+		break;
+	
+	case S2C_BOARD_OTHER://Do a slow toggle of the light to let people know that it is registered as an other board (currently other board should do nothing).
+		while(1){
+			port_pin_toggle_output_level(LED_USER_PIN);
+			delay_ms(1000);
+		}
+		break;
 	//default: do anything?
 	}
 	// Confirm that there is no violation that could lead to the adc channel index being greater than the sample array
