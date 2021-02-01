@@ -33,6 +33,10 @@
 // Function prototypes
 uint8_t get_pinstrap_id(void);
 inline float uint16ToC(uint16_t data);
+void flash_pinstrap_id(uint8_t pin_num);
+void flash_low();
+void flash_high();
+void quick_blink();
 
 void configure_adc(void);
 void configure_can(void);
@@ -48,6 +52,9 @@ void loop_can(void);
 uint8_t board_id = 255;
 enum s2c_board_type board_type = S2C_BOARD_OTHER;
 struct s2c_board_config board_config;
+
+bool FLASH_BOARD_ID = true;
+bool FLASH_CAN_ERROR = false;
 
 // ASF driver instances
 struct adc_module adc_instance;
@@ -106,7 +113,61 @@ inline float uint16ToC(uint16_t data) {
 	return (float)data * 0.02 - 273.15;
 }
 
+/*
+Does a long blink on the user led
+Warning: 1000ms delay total
+*/
+void flash_high(){
+	port_pin_set_output_level(LED_USER_PIN, true);
+	delay_ms(600);
+	port_pin_set_output_level(LED_USER_PIN, false);
+	delay_ms(400);
+}
 
+/*
+does a short blink on the user led
+Warning: 500ms delay
+*/
+void flash_low(){
+	port_pin_set_output_level(LED_USER_PIN, true);
+	delay_ms(50);
+	port_pin_set_output_level(LED_USER_PIN, false);
+	delay_ms(450);
+}
+
+/*
+quick blink
+*/
+void quick_blink(){
+	port_pin_toggle_output_level(LED_USER_PIN);
+	delay_ms(30);
+	port_pin_toggle_output_level(LED_USER_PIN);
+	delay_ms(30);
+}
+
+/*
+flashes out the binary of the board ID
+Warning long delay
+*/
+void flash_pinstrap_id(uint8_t pin_num){
+	int blink_amount = 5;
+	for(int i =0; i <blink_amount; i++){
+		quick_blink();
+	}
+	port_pin_set_output_level(LED_USER_PIN, false);
+	delay_ms(1000);
+
+	uint8_t temp_pin = pin_num;
+	for(int i =0; i<4;i++){
+		if (temp_pin & 1) {
+			flash_high();
+		} else {
+			flash_low();
+		}
+		temp_pin = temp_pin >> 1;//shift over
+	}
+
+}
 
 // Configuration functions
 
@@ -337,6 +398,10 @@ int main (void)
 	
 	system_interrupt_enable_global();
 	
+	if(FLASH_BOARD_ID){
+		flash_pinstrap_id(board_id);
+	}
+	
 	// Turn on generic LED to indicate that config is done
 	port_pin_set_output_level(LED_USER_PIN, true);
 	
@@ -366,5 +431,8 @@ void CAN0_Handler(void)
 	if ((status & CAN_PROTOCOL_ERROR_ARBITRATION) || (status & CAN_PROTOCOL_ERROR_DATA)) {
 		can_clear_interrupt_status(&can_instance, CAN_PROTOCOL_ERROR_ARBITRATION | CAN_PROTOCOL_ERROR_DATA);
 		//printf("Protocol error, please double check the clock in two boards. \r\n\r\n");
+		if(FLASH_CAN_ERROR){
+			quick_blink();
+		}
 	}
 }
