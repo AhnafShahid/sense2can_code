@@ -82,63 +82,45 @@ enum status_code i2c_status_code;
 bool can_received = false;
 
 
-/**
- * \brief Gets board ID from pinstrap configuration
- * 
- * \return Board ID
- * 
- */
+
 uint8_t get_pinstrap_id(void) {
 	static uint8_t id = 255;
-	// If not initialized, initialize
-	if(id == 255) {
+	
+	if(id == 255) { //analog write 255
 		int input = port_group_get_input_level(&PORTA, PINSTRAPS);
 		id =	((input & PINSTRAP_0) > 0) | 
-				(((input & PINSTRAP_1) > 0) << 1) | 
+				(((input & PINSTRAP_1) > 0) << 1) | // ??? Why 3 different less thans???
 				(((input & PINSTRAP_2) > 0) << 2) | 
 				(((input & PINSTRAP_3) > 0) << 3);
 	}
 	return id;
 }
 
-/**
- * \brief Converts a raw 16-bit integer value into degrees Celsius 
- * 
- * \return floating point temperature value in degrees Celsius
- * 
- */
+
 inline float uint16ToC(uint16_t data) {
 	
-	return (float)data * 0.02 - 273.15;
+	return (float)data * 0.02 - 273.15; //formula for temperature conversion
 }
 
 
 
-/*
-Does a long blink on the user led
-Warning: 1000ms delay total
-*/
+
 void flash_high(){
-	port_pin_set_output_level(LED_USER_PIN, true);
+	port_pin_set_output_level(LED_USER_PIN, true); // turn on led
 	delay_ms(600);
 	port_pin_set_output_level(LED_USER_PIN, false);
 	delay_ms(400);
-}
+} //long pauses
 
-/*
-does a short blink on the user led
-Warning: 1000ms delay
-*/
+
 void flash_low(){
 	port_pin_set_output_level(LED_USER_PIN, true);
 	delay_ms(50);
 	port_pin_set_output_level(LED_USER_PIN, false);
 	delay_ms(450);
-}
+}//shorter pauses
 
-/*
-quick blink
-*/
+
 
 void quick_blink(){
 	port_pin_toggle_output_level(LED_USER_PIN);
@@ -151,7 +133,7 @@ void quick_blink(){
 flashes out the binary of the board ID
 Warning long delay
 */
-void flash_pinstrap_id(uint8_t pin_num){
+void flash_pinstrap_id(uint8_t pin_num){ ///??? this part why 2 for loops???
 	int blink_amount = 5;
 	for(int i =0; i <blink_amount; i++){
 		quick_blink();
@@ -190,7 +172,7 @@ void configure_adc(void) {
 	
 	adc_register_callback(&adc_instance, adc_callback, ADC_CALLBACK_READ_BUFFER);
 	adc_enable_callback(&adc_instance, ADC_CALLBACK_READ_BUFFER);
-}
+} //initiliaze clocks I guess??
 
 void configure_i2c(void) {
 	struct i2c_master_config config_i2c;
@@ -208,7 +190,7 @@ void configure_i2c(void) {
 	
 	wr_packet.data_length = 1;
 	wr_packet.data = &registerAddress;
-}
+} 
 
 void configure_can(void) {
 	/* Set up the CAN TX/RX pins */
@@ -238,19 +220,19 @@ void configure_can(void) {
 	config_port.input_pull = PORT_PIN_PULL_NONE;
 	port_pin_set_config(CAN_STBY_PIN, &config_port);
 	port_pin_set_output_level(CAN_STBY_PIN, false);
-}
+}//CANBUS initiliazations ??
 
-// Callback functions
+
 
 void adc_callback(struct adc_module *const module) {
-	// Average all samples and store value in channel's buffer
+
 	adc_channel_vals[adc_channel_index] = 0;
 	for(int i = 0; i < ADC_NUM_SAMPLES; i++) {
 		adc_channel_vals[adc_channel_index] += adc_sample_buffer[i];	
 	}
 	adc_channel_vals[adc_channel_index] >>= ADC_SAMPLE_DIV;
 	
-	// If there are still more channels to process, then set up next channel and start the sampling
+	
 	if(adc_channel_index < board_config.adc_channels - 1) {
 		++adc_channel_index;
 		adc_set_positive_input(&adc_instance, adc_channel[adc_channel_index]);
@@ -260,19 +242,19 @@ void adc_callback(struct adc_module *const module) {
 		adc_section_done = true;
 		adc_channel_index = 0;
 	}
-}
+}//read sensors and channels and store information???
 
-// Loop functions
+
 
 void loop_adc(void) {
-	// Make sure this is the start of a sequence, and not in the middle of one
+	
 	if(adc_channel_index == 0) {
 		adc_set_positive_input(&adc_instance, adc_channel[adc_channel_index]);
 		adc_read_buffer_job(&adc_instance, adc_sample_buffer, ADC_NUM_SAMPLES);
 	}
 }
 
-void loop_i2c(void) {
+void loop_i2c(void) { // update statuses??
 	
 	switch(board_type) {
 	case S2C_BOARD_WHEEL:
@@ -321,7 +303,7 @@ void loop_i2c(void) {
 	i2c_section_done = true;
 }
 
-void loop_can(void) {
+void loop_can(void) {//??? more temperature conversions and potentiometer and wheel sensor
 	struct can_tx_element tx_elem;
 	can_get_tx_buffer_element_defaults(&tx_elem);
 	//tx_elem.T0.bit.XTD = 1;
@@ -412,9 +394,9 @@ int main (void)
 			delay_ms(1000);
 		}
 		break;
-	//default: do anything?
+	
 	}
-	// Confirm that there is no violation that could lead to the adc channel index being greater than the sample array
+	//?? This part ???
 	Assert(board_config.adc_channels <= ADC_NUM_CHANNELS);
 	
 	// Configure ADC and I2C depending on board configuration
@@ -424,7 +406,7 @@ int main (void)
 	if(board_config.use_i2c) {
 		configure_i2c();
 	}
-	configure_can(); // this is always configured. any use cases where it shouldn't be?
+	configure_can(); 
 	
 	system_interrupt_enable_global();
 	
@@ -432,18 +414,16 @@ int main (void)
 		flash_pinstrap_id(board_id);
 	}
 	
-	// Turn on generic LED to indicate that config is done
+	
 	port_pin_set_output_level(LED_USER_PIN, true);
 	
 	while (1) {
-		// 1. read ADC, if needed
-		// 2. read I2C, if needed
-		// 3. send data over CAN
+		// check what is being used then loop it and send data in the last if statement
 		
 		if(board_config.use_adc) loop_adc();
 		if(board_config.use_i2c) loop_i2c();
 		
-		// Send data over CAN once it is all available. Would it be more efficient to send it as it's partially available?
+		
 		if((!board_config.use_adc || adc_section_done) && 
 			(!board_config.use_i2c || i2c_section_done)) {
 			loop_can();
@@ -453,14 +433,14 @@ int main (void)
 	}
 }
 
-void CAN0_Handler(void)
+void CAN0_Handler(void) //??? This part ???
 {
 	volatile uint32_t status;
 	status = can_read_interrupt_status(&can_instance);
 	
 	if ((status & CAN_PROTOCOL_ERROR_ARBITRATION) || (status & CAN_PROTOCOL_ERROR_DATA)) {
 		can_clear_interrupt_status(&can_instance, CAN_PROTOCOL_ERROR_ARBITRATION | CAN_PROTOCOL_ERROR_DATA);
-		//printf("Protocol error, please double check the clock in two boards. \r\n\r\n");
+	
 		if(FLAHS_OUT_EXTRA_INFO){
 			quick_blink();
 		}
